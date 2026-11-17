@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Qyora - Smart Campus Student Operating System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              750: '#293548',
+              850: '#151e2e',
+              950: '#0b1120'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="assets/qyora_icon.png" />
+  
+  <!-- Custom Stylesheet with Ambient Background -->
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200 relative selection:bg-indigo-500 selection:text-white">
+
+  <!-- ======================================================== -->
+  <!-- 🌌 INTERESTING AMBIENT BACKGROUND (Glowing Mesh & Orbs)   -->
+  <!-- ======================================================== -->
+  <div class="qyora-ambient-bg" aria-hidden="true">
+    <div class="qyora-grid-pattern"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- Top Glass Header -->
+  <header class="sticky top-0 z-30 bg-white/75 dark:bg-slate-900/75 glass-header border-b border-slate-200/70 dark:border-slate-800/80 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo: Qyora -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="window.App.switchTab('syllabus')">
+        <div class="w-11 h-11 rounded-2xl overflow-hidden shadow-md shadow-indigo-500/20 border border-slate-200/80 dark:border-slate-700 bg-white p-0.5 flex items-center justify-center shrink-0">
+          <img src="assets/qyora_icon.png" alt="Qyora Logo" class="w-full h-full object-contain" />
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="font-black text-lg tracking-tight bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 bg-clip-text text-transparent">
+              qyora
+            </h1>
+            <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-50 text-indigo-600 dark:bg-indigo-950/80 dark:text-indigo-300 border border-indigo-200/50 dark:border-indigo-800">
+              Campus v2.5
+            </span>
+          </div>
+          <p class="text-[11px] text-slate-400 font-medium">Smart Campus & Student Success</p>
+        </div>
+      </div>
+
+      <!-- Quick Campus Widgets & Student Sign-In Controls -->
+      <div class="flex items-center gap-2 sm:gap-4">
+        
+        <!-- Live Campus Quick Status Badges -->
+        <div class="hidden md:flex items-center gap-2 text-xs">
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/60 dark:bg-slate-850/60 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-medium shadow-xs">
+            <span>🔍</span>
+            <span id="quick-stat-lost">4 Open Claims</span>
+          </div>
+          <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/60 dark:bg-slate-850/60 backdrop-blur-md border border-slate-200/60 dark:border-slate-800 text-slate-600 dark:text-slate-300 font-medium shadow-xs">
+            <span>🎫</span>
+            <span id="quick-stat-token">No Queues</span>
+          </div>
+        </div>
+
+        <!-- Student Sign-in / Profile Slot (Rendered dynamically) -->
+        <div id="header-student-profile-slot" class="flex items-center">
+          <!-- Populated by window.App.renderHeaderProfile() -->
+        </div>
+
+        <!-- Dark Mode Toggle Button -->
+        <button id="btn-toggle-theme" title="Toggle Theme" class="p-2 rounded-xl bg-white/80 dark:bg-slate-800/80 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700 transition-all text-sm shadow-xs">
+          <span id="theme-toggle-icon">🌙</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Navigation Tabs Bar -->
+    <div class="border-t border-slate-100/80 dark:border-slate-850/80 bg-white/40 dark:bg-slate-900/40 backdrop-blur-md overflow-x-auto no-scrollbar">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-1.5 sm:gap-2 py-2">
+        
+        <button data-tab="syllabus" class="nav-tab-btn nav-active px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>🧠</span> AI Syllabus & Quiz
+        </button>
+
+        <button data-tab="lostfound" class="nav-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>🛡️</span> Lost & Found Portal
+        </button>
+
+        <button data-tab="phishing" class="nav-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>🚨</span> Fake Internship Detector
+        </button>
+
+        <button data-tab="peer" class="nav-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>🤝</span> Skill Barter & Buddies
+        </button>
+
+        <button data-tab="canteen" class="nav-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>🍱</span> Canteen Smart Token
+        </button>
+
+        <button data-tab="hackathon" class="nav-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>🚀</span> Hackathon Teams
+        </button>
+
+        <button data-tab="groups" class="nav-tab-btn px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap text-slate-600 dark:text-slate-300 hover:bg-slate-100/70 dark:hover:bg-slate-800/70 transition-all flex items-center gap-1.5">
+          <span>👥</span> Inter & Intra Groups
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+
+    <!-- ========================================== -->
+    <!-- TAB 1: AI SYLLABUS, PLANNER & QUIZ GENERATOR -->
+    <!-- ========================================== -->
+    <div id="tab-content-syllabus" class="tab-pane">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+            Qyora Core Academic Intelligence
+          </span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+            AI Syllabus Analysis, Study Planner & Quiz Generator
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Break down complex university syllabi into weighted units, generate spaced-repetition schedules, and test retention instantly.
+          </p>
+        </div>
+
+        <!-- Quick Course Switcher -->
+        <div class="flex items-center gap-2">
+          <label class="text-xs font-bold text-slate-500 dark:text-slate-400">Course:</label>
+          <select id="syllabus-preset-select" class="text-xs px-3 py-2 rounded-xl border border-slate-200/80 dark:border-slate-700 bg-white/80 dark:bg-slate-850/80 backdrop-blur-sm font-semibold text-slate-800 dark:text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <!-- Populated dynamically -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Syllabus Analysis Render Container -->
+      <div id="syllabus-analysis-content" class="mb-8">
+        <!-- Rendered by syllabusPlanner.js -->
+      </div>
+
+      <!-- Two Column Layout: Study Planner + Interactive Quiz -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Study Planner Container -->
+        <div id="study-planner-container">
+          <!-- Rendered by syllabusPlanner.js -->
+        </div>
+
+        <!-- Diagnostic Quiz Container -->
+        <div id="quiz-container">
+          <!-- Rendered by syllabusPlanner.js -->
+        </div>
+      </div>
+
+      <!-- Custom Syllabus Analyzer Box -->
+      <div class="bg-white/80 dark:bg-slate-850/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/70 dark:border-slate-800 shadow-sm">
+        <h4 class="text-sm font-bold text-slate-800 dark:text-white mb-1 flex items-center gap-2">
+          <span>✨</span> Have a Custom Course Syllabus? Analyze with Qyora AI
+        </h4>
+        <p class="text-xs text-slate-400 mb-4">
+          Paste topics or unit contents from your syllabus PDF or professor's handout to extract a custom study roadmap.
+        </p>
+
+        <textarea id="custom-syllabus-input" rows="3" placeholder="e.g. Unit 1: Network Layer & IP Addressing&#10;Unit 2: Routing Protocols (OSPF, BGP)&#10;Unit 3: Transport Layer TCP/UDP flow control..." class="w-full text-xs p-3.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+
+        <div class="flex justify-end">
+          <button id="btn-analyze-custom-syllabus" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold rounded-xl transition-all shadow-sm flex items-center gap-2">
+            <span>🤖</span> Analyze Course & Build Study Plan
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TAB 2: SMART LOST & FOUND PORTAL -->
+    <!-- ========================================== -->
+    <div id="tab-content-lostfound" class="tab-pane hidden">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400">
+            Qyora Campus Safety
+          </span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+            Smart Lost & Found Portal with Item Verification
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Secure campus lost-and-found with anti-theft security questions so only rightful owners can claim valuables.
+          </p>
+        </div>
+
+        <button id="btn-open-report-modal" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2 self-start md:self-auto">
+          <span>+</span> Report Lost or Found Item
+        </button>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div class="bg-white/80 dark:bg-slate-850/80 backdrop-blur-md rounded-2xl p-4 border border-slate-200/70 dark:border-slate-800 shadow-sm mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
+        
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
+          <button data-filter="all" class="lf-type-filter active-lf-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-all">
+            All Items
+          </button>
+          <button data-filter="found" class="lf-type-filter px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-750 text-slate-600 dark:text-slate-300 transition-all">
+            📍 Found Items
+          </button>
+          <button data-filter="lost" class="lf-type-filter px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-750 text-slate-600 dark:text-slate-300 transition-all">
+            🚨 Lost Items
+          </button>
+        </div>
+
+        <!-- Search & Category -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input type="text" id="lf-search-input" placeholder="Search by item, location..." class="text-xs px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white flex-1 sm:w-56 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          
+          <select id="lf-category-select" class="text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white">
+            <option value="all">All Categories</option>
+            <option value="Electronics">Electronics</option>
+            <option value="ID Cards">ID Cards</option>
+            <option value="Audio / Gadgets">Audio & Gadgets</option>
+            <option value="Calculators / Stationery">Stationery</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Feed Grid -->
+      <div id="lost-found-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by lostFound.js -->
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TAB 3: FAKE INTERNSHIP & PHISHING DETECTOR -->
+    <!-- ========================================== -->
+    <div id="tab-content-phishing" class="tab-pane hidden">
+      <div class="mb-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">
+          Qyora Cyber Defense
+        </span>
+        <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+          Fake Internship & Phishing Detection System
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Protect college students from fraudulent recruiters, upfront registration scams, spoofed big-tech offers, and Telegram data-entry traps.
+        </p>
+      </div>
+
+      <!-- Scanner Card -->
+      <div class="bg-white/80 dark:bg-slate-850/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/70 dark:border-slate-800 shadow-sm mb-6">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+          <label class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+            <span>🛡️</span> Paste Offer Letter, Job Post or Email Message:
+          </label>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-400">Quick Test Cases:</span>
+            <button data-sample-id="scam-1" class="btn-load-sample-phish px-2 py-1 rounded-lg bg-rose-50 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-900 font-semibold text-[11px]">
+              🚨 Telegram Scam
+            </button>
+            <button data-sample-id="scam-2" class="btn-load-sample-phish px-2 py-1 rounded-lg bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border border-amber-200 dark:border-amber-900 font-semibold text-[11px]">
+              ⚠️ Fake Google HR
+            </button>
+            <button data-sample-id="legit-1" class="btn-load-sample-phish px-2 py-1 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 font-semibold text-[11px]">
+              ✓ Verified Cisco
+            </button>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <input type="text" id="phishing-sender-domain" placeholder="Sender Email Address (e.g. recruiter@google.com or careers-india@gmail.com)" class="w-full text-xs p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          
+          <textarea id="phishing-input-text" rows="6" placeholder="Paste the complete text of the offer letter, LinkedIn message, or email here..." class="w-full text-xs p-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white leading-relaxed focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+        </div>
+
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div class="text-[11px] text-slate-400 flex items-center gap-1.5">
+            <span>🔒</span> Scans for upfront fee demands, free webmail domains, high-pressure urgency & Telegram links.
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-clear-scan" class="px-4 py-2 border border-slate-200 dark:border-slate-700 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700">
+              Clear
+            </button>
+            <button id="btn-scan-offer" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2">
+              <span>🔍</span> Run AI Threat Analysis
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Results Container -->
+      <div id="phishing-scan-results">
+        <!-- Rendered by phishingDetector.js -->
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TAB 4: PEER-TO-PEER SKILL EXCHANGE -->
+    <!-- ========================================== -->
+    <div id="tab-content-peer" class="tab-pane hidden">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">
+            Qyora Peer Network
+          </span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+            Peer-to-Peer Skill Exchange & Study Buddy Matching
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Barter your knowledge: teach what you excel at (e.g. Python, DSA) in exchange for guidance in subjects you want to master.
+          </p>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="btn-view-my-requests" class="px-4 py-2.5 border border-slate-200/80 dark:border-slate-700 bg-white/80 dark:bg-slate-850/80 text-xs font-bold rounded-xl text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition-all">
+            📬 My Sessions
+          </button>
+          <button id="btn-open-join-peer-modal" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20">
+            + Offer a Skill
+          </button>
+        </div>
+      </div>
+
+      <!-- Search & Filter Bar -->
+      <div class="bg-white/80 dark:bg-slate-850/80 backdrop-blur-md rounded-2xl p-4 border border-slate-200/70 dark:border-slate-800 shadow-sm mb-6 flex items-center gap-3">
+        <span class="text-sm">🔍</span>
+        <input type="text" id="peer-search-input" placeholder="Search by skill to learn (e.g. React, Python, Machine Learning, DSA) or campus spot..." class="w-full text-xs bg-transparent text-slate-800 dark:text-white focus:outline-none" />
+      </div>
+
+      <!-- Peer Directory Grid -->
+      <div id="peer-directory-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Rendered by peerExchange.js -->
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TAB 5: CANTEEN PRE-ORDERING & DIGITAL TOKENS -->
+    <!-- ========================================== -->
+    <div id="tab-content-canteen" class="tab-pane hidden">
+      <div class="mb-6">
+        <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">
+          Qyora Smart Cafeteria
+        </span>
+        <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+          Canteen Pre-Ordering & Digital Token Management
+        </h2>
+        <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+          Order breakfast or lunch ahead of time between lectures, monitor preparation status, and pick up using your smart digital token.
+        </p>
+      </div>
+
+      <!-- Active Token Card (Top Priority Banner) -->
+      <div id="active-token-card-container" class="mb-8">
+        <!-- Rendered by canteen.js -->
+      </div>
+
+      <!-- Two Column Layout: Menu on Left, Cart Drawer on Right -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Menu Section (2 Cols) -->
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Category Tabs -->
+          <div class="flex items-center gap-2 overflow-x-auto pb-1">
+            <button data-category="all" class="canteen-cat-tab active-cat px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white whitespace-nowrap transition-all">
+              All Items
+            </button>
+            <button data-category="Breakfast" class="canteen-cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap transition-all">
+              🥞 Breakfast
+            </button>
+            <button data-category="Meals" class="canteen-cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap transition-all">
+              🍱 Meals & Thalis
+            </button>
+            <button data-category="Quick Bites" class="canteen-cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap transition-all">
+              🥪 Quick Bites
+            </button>
+            <button data-category="Beverages" class="canteen-cat-tab px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 whitespace-nowrap transition-all">
+              ☕ Beverages
+            </button>
+          </div>
+
+          <!-- Menu Grid -->
+          <div id="canteen-menu-grid" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Rendered by canteen.js -->
+          </div>
+        </div>
+
+        <!-- Order Tray / Cart Sidebar (1 Col) -->
+        <div class="lg:col-span-1">
+          <div class="bg-white/80 dark:bg-slate-850/80 backdrop-blur-md rounded-2xl p-6 border border-slate-200/70 dark:border-slate-800 shadow-sm sticky top-24">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-700 mb-4">
+              <h4 class="font-bold text-sm text-slate-800 dark:text-white flex items-center gap-2">
+                <span>🛒</span> Your Order Tray
+              </h4>
+              <span id="canteen-cart-count" class="px-2 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-600 dark:bg-indigo-950 dark:text-indigo-300">
+                0
+              </span>
+            </div>
+
+            <!-- Cart Items List -->
+            <div id="canteen-cart-items" class="space-y-2 mb-6">
+              <!-- Rendered by canteen.js -->
+            </div>
+
+            <!-- Total and Checkout -->
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-700 space-y-3">
+              <div class="flex justify-between items-center text-sm font-extrabold text-slate-800 dark:text-white">
+                <span>Total Amount:</span>
+                <span id="canteen-cart-total" class="text-indigo-600 dark:text-indigo-400 text-lg">₹0</span>
+              </div>
+              <p class="text-[11px] text-slate-400">Tokens are called automatically when ready at pickup counters.</p>
+
+              <button id="btn-canteen-checkout" disabled class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center justify-center gap-2">
+                <span>🎫</span> Generate Digital Token
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TAB 6: HACKATHON TEAM FORMATION -->
+    <!-- ========================================== -->
+    <div id="tab-content-hackathon" class="tab-pane hidden">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+            Qyora Hackathon Arena
+          </span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+            Hackathon Team Formation & Collaboration Portal
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Find the missing puzzle pieces for your hackathon squad: connect developers with UI/UX designers, pitch leads, and hardware builders.
+          </p>
+        </div>
+
+        <button id="btn-open-create-team" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20">
+          + Create Hackathon Team
+        </button>
+      </div>
+
+      <div id="hackathon-content-container">
+        <!-- Rendered by hackathon.js -->
+      </div>
+    </div>
+
+
+    <!-- ========================================== -->
+    <!-- TAB 7: INTER & INTRA DEPARTMENT GROUPS    -->
+    <!-- ========================================== -->
+    <div id="tab-content-groups" class="tab-pane hidden">
+      <div class="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
+            Qyora Campus Synergy
+          </span>
+          <h2 class="text-2xl font-black text-slate-900 dark:text-white mt-1">
+            Inter & Intra-Department Groups Hub
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+            Form student circles within your department or collaborate cross-branch with engineers, designers, and managers on real campus projects.
+          </p>
+        </div>
+
+        <button id="btn-open-create-group" class="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20 flex items-center gap-2 self-start md:self-auto">
+          <span>+</span> Form a Group
+        </button>
+      </div>
+
+      <!-- Filters & Search Toolbar -->
+      <div class="bg-white/80 dark:bg-slate-850/80 backdrop-blur-md rounded-2xl p-4 border border-slate-200/70 dark:border-slate-800 shadow-sm mb-6 flex flex-col sm:flex-row gap-3 items-center justify-between">
+        
+        <!-- Scope Filter Tabs -->
+        <div class="flex items-center gap-1.5 w-full sm:w-auto overflow-x-auto">
+          <button data-scope="all" class="group-scope-filter active-scope-tab px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 text-white transition-all">
+            All Groups
+          </button>
+          <button data-scope="intra" class="group-scope-filter px-3 py-1.5 rounded-xl text-xs font-bold bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 transition-all">
+            🏢 Intra-Dept
+          </button>
+          <button data-scope="inter" class="group-scope-filter px-3 py-1.5 rounded-xl text-xs font-bold bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 transition-all">
+            🌐 Inter-Dept
+          </button>
+          <button data-scope="joined" class="group-scope-filter px-3 py-1.5 rounded-xl text-xs font-bold bg-white/70 dark:bg-slate-800/70 text-slate-600 dark:text-slate-300 transition-all">
+            ⭐ My Groups
+          </button>
+        </div>
+
+        <!-- Department Filter & Search -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+          <input type="text" id="groups-search-input" placeholder="Search circles, topics..." class="text-xs px-3.5 py-2 rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white flex-1 sm:w-52 focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+          
+          <select id="groups-dept-filter" class="text-xs px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-750 bg-slate-50/70 dark:bg-slate-750/70 text-slate-800 dark:text-white">
+            <option value="all">All Departments</option>
+            <option value="CSE">CSE</option>
+            <option value="ECE">ECE</option>
+            <option value="AIDS">AI & Data Science</option>
+            <option value="IT">IT</option>
+            <option value="MECH">Mechanical</option>
+            <option value="EEE">Electrical</option>
+            <option value="MBA">Management</option>
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Two-Column Interactive Layout: Group Directory List + Live Discussion Feed -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Groups Roster List (Col 1) -->
+        <div class="lg:col-span-1 space-y-3 max-h-[700px] overflow-y-auto pr-1" id="groups-roster-list">
+          <!-- Rendered by campusGroups.js -->
+        </div>
+
+        <!-- Live Group Discussion Panel (Col 2 & 3) -->
+        <div class="lg:col-span-2" id="active-group-discussion-panel">
+          <!-- Rendered by campusGroups.js -->
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Global Modal Wrapper -->
+  <div id="modal-wrapper" class="fixed inset-0 z-50 flex items-center justify-center p-4 hidden">
+    <!-- Backdrop -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-950/65 backdrop-blur-md transition-opacity"></div>
+    
+    <!-- Modal Card Container -->
+    <div class="relative bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-200/80 dark:border-slate-800 z-10 max-h-[92vh] overflow-y-auto">
+      <div id="modal-content-area">
+        <!-- Injected dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200/70 dark:border-slate-800/80 py-6 text-center text-xs text-slate-400 bg-white/50 dark:bg-slate-900/50 backdrop-blur-sm relative z-10">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <div class="w-5 h-5 rounded-md overflow-hidden bg-white shadow-xs p-0.5">
+          <img src="assets/qyora_icon.png" alt="Qyora Logo" class="w-full h-full object-contain" />
+        </div>
+        <span class="font-extrabold text-indigo-600 dark:text-indigo-400">qyora</span>
+        <span>• Smart Campus & Student Success</span>
+      </div>
+      <div class="flex items-center gap-4 text-slate-500 dark:text-slate-400">
+        <span>Friction-Free University Living</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Submodule Scripts -->
+  <script src="js/data/mockData.js"></script>
+  <script src="js/modules/syllabusPlanner.js"></script>
+  <script src="js/modules/lostFound.js"></script>
+  <script src="js/modules/phishingDetector.js"></script>
+  <script src="js/modules/peerExchange.js"></script>
+  <script src="js/modules/canteen.js"></script>
+  <script src="js/modules/hackathon.js"></script>
+  <script src="js/modules/campusGroups.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
